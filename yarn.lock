@@ -5433,6 +5433,7 @@ __metadata:
     "@types/node": ^18
     nuxt: ^3.5.2
     tencentcloud-sdk-nodejs-sms: ^4.0.623
+    vue: ^3.3.4
   languageName: unknown
   linkType: soft
 
