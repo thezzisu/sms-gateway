@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   console.log(config)
   const tokens: string[] = config.apiTokens.split(',')
   const body = await readBody(event)
-  const token = getHeader(event, 'X-API-TOKEN') ?? body.apiToken
+  const token = getHeader(event, 'X-API-TOKEN') || body.apiToken
   if (!token || !tokens.includes(token)) {
     throw createError({ statusCode: 401, message: 'Unauthorized: Missing or invalid API token' })
   }
