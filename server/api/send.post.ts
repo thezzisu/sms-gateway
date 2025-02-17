@@ -13,12 +13,23 @@ const C = TypeCompiler.Compile(
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  console.log(config)
   const tokens: string[] = config.apiTokens.split(',')
   const body = await readBody(event)
+  if (!C.Check(body)) {
+    throw createError({ statusCode: 400, message: 'Bad Request' })
+  }
   const token = getHeader(event, 'X-API-TOKEN') || body.apiToken
-  if (!token || !tokens.includes(token)) {
-    throw createError({ statusCode: 401, message: 'Unauthorized: Missing or invalid API token' })
+  if (!token) {
+    throw createError({
+      statusCode: 401,
+      message: 'Unauthorized: Missing API token'
+    })
+  }
+  if (!tokens.includes(token)) {
+    throw createError({
+      statusCode: 403,
+      message: 'Forbidden: Invalid API token'
+    })
   }
   const client = new tencent.sms.v20210111.Client({
     credential: {
@@ -32,9 +43,7 @@ export default defineEventHandler(async (event) => {
       }
     }
   })
-  if (!C.Check(body)) {
-    throw createError({ statusCode: 400, message: 'Bad Request' })
-  }
+
   const resp = await client.SendSms({
     PhoneNumberSet: body.targets,
     SmsSdkAppId: '' + config.tencentSmsAppId,
